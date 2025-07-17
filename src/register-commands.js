@@ -96,6 +96,24 @@ const commands = [
       },
     ],
   },
+  {
+    name: "ban-user",
+    description: "Bans a user from the server",
+    options: [
+      {
+        name: "user",
+        description: "The user to ban",
+        type: ApplicationCommandOptionType.User,
+        required: true,
+      },
+      {
+        name: "reason",
+        description: "The reason for banning the user",
+        type: ApplicationCommandOptionType.String,
+        required: true,
+      },
+    ],
+  },
 
   // Mini Games
   {
@@ -122,6 +140,12 @@ const commands = [
         ],
       },
     ],
+  },
+
+  // Extra commands
+  {
+    name: "dwayne-github",
+    description: "Takes you to Dwayne's GitHub",
   },
 ];
 

@@ -200,6 +200,56 @@ client.on("interactionCreate", async (interaction) => {
     }
   }
 
+  if (interaction.commandName === "ban-user") {
+    await interaction.deferReply({ flags: "Ephemeral" });
+
+    const user = interaction.options.getUser("user");
+    const reason = interaction.options.getString("reason");
+
+    if (!user) {
+      await interaction.editReply("⚠️ Please specify a user to ban.");
+      return;
+    }
+
+    if (!reason) {
+      await interaction.editReply("⚠️ Please provide a reason for the ban.");
+      return;
+    }
+
+    try {
+      const member =
+        interaction.guild.members.cache.get(user.id) ??
+        (await interaction.guild.members.fetch(user.id).catch(() => null));
+
+      console.log("Command executed by:", interaction.user.tag);
+      console.log("User to ban:", user.tag, user.id);
+      console.log("Guild ID:", interaction.guild.id);
+      console.log("Member object:", member);
+
+      if (!member) {
+        await interaction.editReply("⚠️ That user is not in this server.");
+        return;
+      }
+
+      if (!member.bannable) {
+        await interaction.editReply(
+          "⚠️ I can't ban this user. They might have a higher role or I lack permissions."
+        );
+        return;
+      }
+
+      await member.ban({ reason });
+      await interaction.editReply(
+        `✅ Successfully banned **${user.tag}** from the server.`
+      );
+    } catch (error) {
+      console.error(`❌ Error banning user: ${error}`);
+      await interaction.editReply(
+        "❌ An error occurred while trying to ban the user."
+      );
+    }
+  }
+
   // Mini Games
   if (interaction.commandName === "flip-coin") {
     const result = Math.random() < 0.5 ? "Heads" : "Tails";
@@ -255,6 +305,20 @@ client.on("interactionCreate", async (interaction) => {
       .setColor("#fe640b")
       .setFooter({ text: "Rock Paper Scissors Game" })
       .setTimestamp();
+
+    await interaction.editReply({ embeds: [embed] });
+  }
+
+  // Extra commands
+  if (interaction.commandName === "dwayne-github") {
+    await interaction.deferReply({});
+    const embed = new EmbedBuilder()
+      .setTitle("Dwayne's GitHub")
+      .setDescription(
+        "Click [here](https://github.com/DwayneCrous) to visit Dwayne's GitHub profile!"
+      )
+      .setColor("#df8e1d")
+      .setFooter({ text: "Dwayne's GitHub" });
 
     await interaction.editReply({ embeds: [embed] });
   }
