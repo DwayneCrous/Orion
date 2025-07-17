@@ -14,6 +14,16 @@ client.on("ready", (c) => {
   console.log(`✅ ${c.user.tag} is online successfully!`);
 });
 
+// client.on("messageCreate", (message) => {
+//   if (message.author.bot) {
+//     return;
+//   }
+
+//   if (message.channel.id === "978289666644127826") {
+//     message.reply("https://tenor.com/view/licka-gif-14906784873940801969");
+//   }
+// });
+
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
