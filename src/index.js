@@ -1,0 +1,216 @@
+require("dotenv").config();
+const { Client, IntentsBitField, EmbedBuilder, Embed } = require("discord.js");
+
+const client = new Client({
+  intents: [
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMembers,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.MessageContent,
+  ],
+});
+
+client.on("ready", (c) => {
+  console.log(`✅ ${c.user.tag} is online successfully!`);
+});
+
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+
+  // API commands
+  if (interaction.commandName === "get-weather") {
+    const location = interaction.options.getString("location");
+    const units = interaction.options.getString("units");
+
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=${units}&appid=${process.env.WEATHER_API_KEY}`;
+
+    try {
+      await interaction.deferReply();
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        await interaction.reply("⚠️ Weather data not found for that location.");
+        return;
+      }
+
+      const data = await response.json();
+
+      const embed = new EmbedBuilder()
+        .setTitle(`🌤️ Weather in ${data.name}`)
+        .setDescription(`**Current Temperature:** ${data.main.temp}°`)
+        .setColor("#ea76cb")
+        .addFields(
+          { name: "Humidity", value: `${data.main.humidity}%`, inline: true },
+          { name: "Wind Speed", value: `${data.wind.speed} m/s`, inline: true }
+        )
+        .setFooter({
+          text: "Powered by OpenWeather",
+        })
+        .setTimestamp();
+
+      await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      console.error(`❌ Error fetching weather data: ${error}`);
+      await interaction.reply(
+        "❌ An error occurred while fetching the weather data."
+      );
+    }
+  }
+
+  if (interaction.commandName === "currency-convert") {
+    const amount = interaction.options.getNumber("amount");
+    const fromCurrency = interaction.options
+      .getString("from_currency")
+      .toUpperCase();
+    const toCurrency = interaction.options
+      .getString("to_currency")
+      .toUpperCase();
+
+    const url = `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`;
+
+    try {
+      await interaction.deferReply();
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        await interaction.reply("⚠️ Currency data not found.");
+        return;
+      }
+
+      const data = await response.json();
+      const rate = data.rates[toCurrency];
+
+      if (!rate) {
+        await interaction.reply("⚠️ Invalid currency conversion.");
+        return;
+      }
+
+      const convertedAmount = (amount * rate).toFixed(2);
+
+      const embed = new EmbedBuilder()
+        .setTitle("💵 Currency Conversion")
+        .setDescription(
+          `${amount} ${fromCurrency} is equal to ${convertedAmount} ${toCurrency}.`
+        )
+        .setColor("#e64553")
+        .setFooter({ text: "Powered by ExchangeRate-API" })
+        .setTimestamp();
+
+      await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      console.error(`❌ Error fetching currency data: ${error}`);
+      await interaction.reply(
+        "❌ An error occurred while fetching the currency data."
+      );
+    }
+  }
+
+  // Moderation commands
+  if (interaction.commandName === "expunge-message") {
+    await interaction.deferReply({ ephemeral: true });
+    const amount = interaction.options.getInteger("amount");
+    const channel = interaction.options.getChannel("channel");
+
+    if (!channel.isTextBased()) {
+      await interaction.editReply("⚠️ Please select a valid text channel.");
+      return;
+    }
+
+    if (amount < 1 || amount > 100) {
+      await interaction.editReply(
+        "⚠️ You must specify between 1 and 100 messages to delete."
+      );
+      return;
+    }
+
+    try {
+      const messages = await channel.messages.fetch({ limit: amount });
+
+      const deleted = await channel.bulkDelete(messages, true);
+
+      await interaction.editReply(
+        `✅ Successfully deleted ${deleted.size} messages from ${channel}.`
+      );
+    } catch (error) {
+      console.error(`❌ Error deleting messages: ${error}`);
+      await interaction.editReply({
+        content: "❌ An error occurred while deleting messages.",
+        flags: 64, // ephemeral: true (but this is deprecated)
+      });
+    }
+  }
+
+  if (interaction.commandName === "kick-user") {
+    await interaction.deferReply({ ephemeral: true });
+
+    const user = interaction.options.getUser("user");
+    const reason = interaction.options.getString("reason");
+
+    if (!user) {
+      await interaction.editReply("⚠️ Please specify a user to kick.");
+      return;
+    }
+
+    if (!reason) {
+      await interaction.editReply("⚠️ Please provide a reason for the kick.");
+      return;
+    }
+
+    try {
+      const member = await interaction.guild.members
+        .fetch(user.id)
+        .catch(() => null);
+
+      if (!member) {
+        await interaction.editReply("⚠️ That user is not in this server.");
+        return;
+      }
+
+      if (!member.kickable) {
+        await interaction.editReply(
+          "⚠️ I can't kick this user. They might have a higher role or I lack permissions."
+        );
+        return;
+      }
+
+      await member.kick(reason);
+      await interaction.editReply(
+        `✅ Successfully kicked **${user.tag}** from the server.`
+      );
+    } catch (error) {
+      console.error(`❌ Error kicking user: ${error}`);
+      await interaction.editReply(
+        "❌ An error occurred while trying to kick the user."
+      );
+    }
+  }
+
+  // Mini Games
+  if (interaction.commandName === "flip-coin") {
+    const result = Math.random() < 0.5 ? "Heads" : "Tails";
+
+    const embed = new EmbedBuilder()
+      .setTitle("🪙 Coin Flip Result")
+      .setDescription(`The coin landed on: **${result}**`)
+      .setColor("#8839ef")
+      .setFooter({ text: "Coin Flip Game" })
+      .setTimestamp();
+
+    await interaction.reply({ embeds: [embed] });
+  }
+
+  if (interaction.commandName === "dice-roll") {
+    const result = Math.floor(Math.random() * 6) + 1;
+
+    const embed = new EmbedBuilder()
+      .setTitle("🎲 Dice Roll Result")
+      .setDescription(`You rolled a **${result}**`)
+      .setColor("#d20f39")
+      .setFooter({ text: "Dice Roll Game" })
+      .setTimestamp();
+
+    await interaction.reply({ embeds: [embed] });
+  }
+});
+
+client.login(process.env.TOKEN);
