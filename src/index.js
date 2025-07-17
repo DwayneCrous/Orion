@@ -107,7 +107,7 @@ client.on("interactionCreate", async (interaction) => {
 
   // Moderation commands
   if (interaction.commandName === "expunge-message") {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: "Ephemeral" });
     const amount = interaction.options.getInteger("amount");
     const channel = interaction.options.getChannel("channel");
 
@@ -135,13 +135,13 @@ client.on("interactionCreate", async (interaction) => {
       console.error(`❌ Error deleting messages: ${error}`);
       await interaction.editReply({
         content: "❌ An error occurred while deleting messages.",
-        flags: 64, // ephemeral: true (but this is deprecated)
+        flags: "Ephemeral",
       });
     }
   }
 
   if (interaction.commandName === "kick-user") {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: "Ephemeral" });
 
     const user = interaction.options.getUser("user");
     const reason = interaction.options.getString("reason");
@@ -157,9 +157,14 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     try {
-      const member = await interaction.guild.members
-        .fetch(user.id)
-        .catch(() => null);
+      const member =
+        interaction.guild.members.cache.get(user.id) ??
+        (await interaction.guild.members.fetch(user.id).catch(() => null));
+
+      console.log("Command executed by:", interaction.user.tag);
+      console.log("User to kick:", user.tag, user.id);
+      console.log("Guild ID:", interaction.guild.id);
+      console.log("Member object:", member);
 
       if (!member) {
         await interaction.editReply("⚠️ That user is not in this server.");
