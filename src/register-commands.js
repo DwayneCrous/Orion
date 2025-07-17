@@ -106,6 +106,23 @@ const commands = [
     name: "dice-roll",
     description: "Rolls a dice and returns a number between 1 and 6",
   },
+  {
+    name: "rock-paper-scissors",
+    description: "Play rock-paper-scissors with the bot",
+    options: [
+      {
+        name: "choice",
+        description: "Your choice (rock, paper, or scissors)",
+        type: ApplicationCommandOptionType.String,
+        required: true,
+        choices: [
+          { name: "Rock", value: "rock" },
+          { name: "Paper", value: "paper" },
+          { name: "Scissors", value: "scissors" },
+        ],
+      },
+    ],
+  },
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
