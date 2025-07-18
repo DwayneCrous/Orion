@@ -65,8 +65,6 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 
 ## 📋 Commands
 
-## 📋 Commands
-
 ### API & Utility Commands
 
 - `/todays-overview`  
