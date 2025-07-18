@@ -30,6 +30,33 @@ const commands = [
         .setDescription("The member to assign the role to")
         .setRequired(true)
     ),
+  new SlashCommandBuilder()
+    .setName("create-poll")
+    .setDescription("Creates a poll with the specified question and options")
+    .addStringOption((option) =>
+      option
+        .setName("question")
+        .setDescription("The question for the poll")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("option1")
+        .setDescription("The first option for the poll")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("option2")
+        .setDescription("The second option for the poll")
+        .setRequired(true)
+    )
+    .addNumberOption((option) =>
+      option
+        .setName("duration")
+        .setDescription("The duration of the poll in minutes")
+        .setRequired(true)
+    ),
 
   // API commands
   new SlashCommandBuilder()
