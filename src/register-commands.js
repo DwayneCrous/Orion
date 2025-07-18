@@ -15,6 +15,21 @@ const commands = [
         .setDescription("The user to get the avatar of")
         .setRequired(true)
     ),
+  new SlashCommandBuilder()
+    .setName("set-role")
+    .setDescription("Assigns a role to a specified member")
+    .addRoleOption((option) =>
+      option
+        .setName("role")
+        .setDescription("The role to assign to the member")
+        .setRequired(true)
+    )
+    .addUserOption((option) =>
+      option
+        .setName("member")
+        .setDescription("The member to assign the role to")
+        .setRequired(true)
+    ),
 
   // API commands
   new SlashCommandBuilder()
