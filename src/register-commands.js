@@ -133,6 +133,28 @@ const commands = [
       },
     ],
   },
+  {
+    name: "bad-word-filter",
+    description: "Automatically deletes messages containing banned words",
+    options: [
+      {
+        name: "toggle",
+        description: "Enable or disable the bad word filter",
+        type: ApplicationCommandOptionType.Boolean,
+        required: true,
+        choices: [
+          { name: "Enable", value: true },
+          { name: "Disable", value: false },
+        ],
+      },
+      {
+        name: "word",
+        description: "Words to filter",
+        type: ApplicationCommandOptionType.String,
+        required: false,
+      },
+    ],
+  },
 
   // Mini Games
   {

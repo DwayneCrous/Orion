@@ -24,6 +24,28 @@ client.on("ready", (c) => {
 //   }
 // });
 
+// bad word filter feature
+client.on("messageCreate", (message) => {
+  if (message.author.bot || !message.guild) return;
+
+  const filter = client.badWordFilter || [];
+
+  for (const word of filter) {
+    if (message.content.toLowerCase().includes(word.toLowerCase())) {
+      message.delete().catch(console.error);
+      message.channel
+        .send({
+          content: `⚠️ ${message.author}, watch your language.`,
+          ephemeral: false,
+        })
+        .then((msg) => {
+          setTimeout(() => msg.delete().catch(() => {}), 5000);
+        });
+      break;
+    }
+  }
+});
+
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
@@ -299,6 +321,61 @@ client.on("interactionCreate", async (interaction) => {
       await interaction.editReply(
         "❌ An error occurred while trying to mute the user."
       );
+    }
+  }
+
+  if (interaction.commandName === "bad-word-filter") {
+    await interaction.deferReply({ flags: "Ephemeral" });
+
+    const toggle = interaction.options.getBoolean("toggle");
+    const word = interaction.options.getString("word");
+
+    if (toggle === null) {
+      await interaction.editReply(
+        "⚠️ Please specify whether to enable or disable the filter."
+      );
+      return;
+    }
+
+    if (!word) {
+      await interaction.editReply("⚠️ Please provide a word to filter.");
+      return;
+    }
+
+    try {
+      const filter = client.badWordFilter || [];
+      if (toggle) {
+        if (!filter.includes(word)) {
+          filter.push(word);
+          client.badWordFilter = filter;
+          await interaction.editReply(
+            `✅ Bad word filter enabled. Filtering out: **${word}**`
+          );
+        } else {
+          await interaction.editReply(
+            "⚠️ This word is already in the bad word filter."
+          );
+        }
+      } else {
+        const index = filter.indexOf(word);
+        if (index > -1) {
+          filter.splice(index, 1);
+          client.badWordFilter = filter;
+          await interaction.editReply(
+            `✅ Bad word filter disabled for: **${word}**`
+          );
+        } else {
+          await interaction.editReply(
+            "⚠️ This word is not in the bad word filter."
+          );
+        }
+      }
+    } catch (error) {
+      console.error(`❌ Error toggling bad word filter: ${error}`);
+      await interaction.editReply(
+        "❌ An error occurred while trying to toggle the bad word filter."
+      );
+      return;
     }
   }
 
