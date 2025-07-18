@@ -9,7 +9,10 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 - **Weather API**: Get current weather for any location.
 - **News Headlines**: Get the top 3 latest news headlines for South Africa in the daily overview.
 - **Currency Converter**: Convert amounts between currencies.
-- **Moderation Tools**: Kick, ban, mute users, bulk delete messages, and filter bad words (now with per-word toggling and detailed feedback).
+- **Moderation Tools**: Kick, ban, mute users, bulk delete messages, set slowmode, set nicknames, assign roles, and filter bad words (now with per-word toggling and detailed feedback).
+- **Role Management**: Assign roles to members directly from Discord.
+- **Nickname Management**: Set user nicknames easily.
+- **Slowmode Control**: Set slowmode for any text channel.
 - **Bad Word Filter**: Enable or disable filtering of specific words, with instant moderation.
 - **Mini-Games**: Flip a coin, roll a dice, play rock-paper-scissors—all with interactive embeds.
 - **User Utilities**: Get any user's avatar with a single command.
@@ -62,43 +65,51 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 
 ## 📋 Commands
 
+## 📋 Commands
+
 ### API & Utility Commands
 
-- `/todays-overview`
-  - Get a daily overview with weather and top 3 news headlines for South Africa.
-- `/get-weather location:<string> units:<Celsius|Fahrenheit>`
-  - Get current weather for a location.
-- `/currency-convert amount:<number> from_currency:<string> to_currency:<string>`
-  - Convert currency amounts.
-- `/get-avatar user:<user>`
-  - Get the avatar of any user.
+- `/todays-overview`  
+  Get a daily overview with weather and top 3 news headlines for South Africa.
+- `/get-weather location:<string> units:<Celsius|Fahrenheit>`  
+  Get current weather for a location.
+- `/currency-convert amount:<number> from_currency:<string> to_currency:<string>`  
+  Convert currency amounts.
+- `/get-avatar user:<user>`  
+  Get the avatar of any user.
+- `/set-role role:<role> member:<user>`  
+  Assign a role to a member.
+- `/set-nickname user:<user> nickname:<string>`  
+  Set a user's nickname for the server.
+- `/set-slowmode channel:<channel> duration:<seconds>`  
+  Set slowmode for a text channel.
 
 ### Moderation
 
-- `/expunge-message amount:<1-100> channel:<channel>`
-  - Bulk delete messages in a channel, with feedback on success or errors.
-- `/kick-user user:<user> reason:<string>`
-  - Kick a user from the server, with detailed error handling.
-- `/ban-user user:<user> reason:<string>`
-  - Ban a user from the server, with detailed error handling.
-- `/mute-user user:<user> duration:<seconds>`
-  - Temporarily mute a user, with feedback.
-- `/bad-word-filter toggle:<Enable|Disable> word:<string>`
-  - Enable or disable filtering of specific words (per-word toggle, instant effect).
+- `/expunge-message amount:<1-100> channel:<channel>`  
+  Bulk delete messages in a channel, with feedback on success or errors.
+- `/kick-user user:<user> reason:<string>`  
+  Kick a user from the server, with detailed error handling.
+- `/ban-user user:<user> reason:<string>`  
+  Ban a user from the server, with detailed error handling.
+- `/mute-user user:<user> duration:<seconds>`  
+  Temporarily mute a user, with feedback.
+- `/bad-word-filter toggle:<Enable|Disable> word:<string>`  
+  Enable or disable filtering of specific words (per-word toggle, instant effect).
 
 ### Mini-Games
 
-- `/flip-coin`
-  - Flip a coin and get the result in an interactive embed.
-- `/dice-roll`
-  - Roll a dice (1-6) and see the result in an embed.
-- `/rock-paper-scissors choice:<rock|paper|scissors>`
-  - Play against the bot with instant feedback and result embed.
+- `/flip-coin`  
+  Flip a coin and get the result in an interactive embed.
+- `/dice-roll`  
+  Roll a dice (1-6) and see the result in an embed.
+- `/rock-paper-scissors choice:<rock|paper|scissors>`  
+  Play against the bot with instant feedback and result embed.
 
 ### Extras
 
-- `/dwayne-github`
-  - Get a link to Dwayne's GitHub profile.
+- `/dwayne-github`  
+  Get a link to Dwayne's GitHub profile.
 
 ---
 
