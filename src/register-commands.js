@@ -7,6 +7,18 @@ const commands = [
     name: "todays-overview",
     description: "Provides an overview of today's weather and latest news",
   },
+  {
+    name: "get-avatar",
+    description: "Gets the avatar of a user",
+    options: [
+      {
+        name: "user",
+        description: "The user to get the avatar of",
+        type: ApplicationCommandOptionType.User,
+        required: true,
+      },
+    ],
+  },
 
   // API commands
   {

@@ -147,6 +147,25 @@ client.on("interactionCreate", async (interaction) => {
     await interaction.editReply({ embeds: [embed] });
   }
 
+  if (interaction.commandName === "get-avatar") {
+    await interaction.deferReply({});
+
+    const user = interaction.options.getUser("user");
+    if (!user) {
+      await interaction.editReply(
+        "⚠️ Please specify a user to get the avatar of."
+      );
+      return;
+    }
+
+    const embed = new EmbedBuilder()
+      .setTitle(`${user.username}'s Avatar`)
+      .setImage(user.displayAvatarURL({ size: 512, dynamic: true }))
+      .setColor("#179299");
+
+    await interaction.editReply({ embeds: [embed] });
+  }
+
   // API commands
   if (interaction.commandName === "get-weather") {
     const location = interaction.options.getString("location");
