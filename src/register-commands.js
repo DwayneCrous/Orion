@@ -1,231 +1,185 @@
 require("dotenv").config();
-const { REST, Routes, ApplicationCommandOptionType } = require("discord.js");
+const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
 const commands = [
   // Server utility commands
-  {
-    name: "todays-overview",
-    description: "Provides an overview of today's weather and latest news",
-  },
-  {
-    name: "get-avatar",
-    description: "Gets the avatar of a user",
-    options: [
-      {
-        name: "user",
-        description: "The user to get the avatar of",
-        type: ApplicationCommandOptionType.User,
-        required: true,
-      },
-    ],
-  },
+  new SlashCommandBuilder()
+    .setName("todays-overview")
+    .setDescription("Provides an overview of today's weather and latest news"),
+  new SlashCommandBuilder()
+    .setName("get-avatar")
+    .setDescription("Gets the avatar of a user")
+    .addUserOption((option) =>
+      option
+        .setName("user")
+        .setDescription("The user to get the avatar of")
+        .setRequired(true)
+    ),
 
   // API commands
-  {
-    name: "get-weather",
-    description: "Gets the current weather for a location",
-    options: [
-      {
-        name: "location",
-        description: "The location to get the weather for",
-        type: ApplicationCommandOptionType.String,
-        required: true,
-      },
-      {
-        name: "units",
-        description: "The units for the temperature",
-        type: ApplicationCommandOptionType.String,
-        required: true,
-        choices: [
-          {
-            name: "Celsius",
-            value: "metric",
-          },
-          {
-            name: "Fahrenheit",
-            value: "imperial",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    name: "currency-convert",
-    description: "Converts an amount from one currency to another",
-    options: [
-      {
-        name: "amount",
-        description: "The amount to convert",
-        type: ApplicationCommandOptionType.Number,
-        required: true,
-      },
-      {
-        name: "from_currency",
-        description: "The currency to convert from",
-        type: ApplicationCommandOptionType.String,
-        required: true,
-      },
-      {
-        name: "to_currency",
-        description: "The currency to convert to",
-        type: ApplicationCommandOptionType.String,
-        required: true,
-      },
-    ],
-  },
+  new SlashCommandBuilder()
+    .setName("get-weather")
+    .setDescription("Gets the current weather for a location")
+    .addStringOption((option) =>
+      option
+        .setName("location")
+        .setDescription("The location to get the weather for")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("units")
+        .setDescription("The units for the temperature")
+        .setRequired(true)
+        .addChoices(
+          { name: "Celsius", value: "metric" },
+          { name: "Fahrenheit", value: "imperial" }
+        )
+    ),
+  new SlashCommandBuilder()
+    .setName("currency-convert")
+    .setDescription("Converts an amount from one currency to another")
+    .addNumberOption((option) =>
+      option
+        .setName("amount")
+        .setDescription("The amount to convert")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("from_currency")
+        .setDescription("The currency to convert from")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("to_currency")
+        .setDescription("The currency to convert to")
+        .setRequired(true)
+    ),
 
   // Moderation commands
-  {
-    name: "expunge-message",
-    description:
-      "Deletes a specified amount of the latest messages from a channel",
-    options: [
-      {
-        name: "amount",
-        description: "The number of messages to delete",
-        type: ApplicationCommandOptionType.Integer,
-        required: true,
-        min_value: 1,
-        max_value: 100,
-      },
-      {
-        name: "channel",
-        description: "The channel to delete messages from",
-        type: ApplicationCommandOptionType.Channel,
-        required: true,
-      },
-    ],
-  },
-  {
-    name: "kick-user",
-    description: "Kicks a user from the server",
-    options: [
-      {
-        name: "user",
-        description: "The user to kick",
-        type: ApplicationCommandOptionType.User,
-        required: true,
-      },
-      {
-        name: "reason",
-        description: "The reason for kicking the user",
-        type: ApplicationCommandOptionType.String,
-        required: true,
-      },
-    ],
-  },
-  {
-    name: "ban-user",
-    description: "Bans a user from the server",
-    options: [
-      {
-        name: "user",
-        description: "The user to ban",
-        type: ApplicationCommandOptionType.User,
-        required: true,
-      },
-      {
-        name: "reason",
-        description: "The reason for banning the user",
-        type: ApplicationCommandOptionType.String,
-        required: true,
-      },
-    ],
-  },
-  {
-    name: "mute-user",
-    description: "Mutes a user for a specified duration",
-    options: [
-      {
-        name: "user",
-        description: "The user to mute",
-        type: ApplicationCommandOptionType.User,
-        required: true,
-      },
-      {
-        name: "duration",
-        description: "The duration of the mute (in seconds)",
-        type: ApplicationCommandOptionType.Integer,
-        required: true,
-        min_value: 1,
-      },
-    ],
-  },
-  {
-    name: "bad-word-filter",
-    description: "Automatically deletes messages containing banned words",
-    options: [
-      {
-        name: "toggle",
-        description: "Enable or disable the bad word filter",
-        type: ApplicationCommandOptionType.Boolean,
-        required: true,
-        choices: [
-          { name: "Enable", value: true },
-          { name: "Disable", value: false },
-        ],
-      },
-      {
-        name: "word",
-        description: "Words to filter",
-        type: ApplicationCommandOptionType.String,
-        required: false,
-      },
-    ],
-  },
-  {
-    name: "set-slowmode",
-    description: "Sets a slowmode for a channel",
-    options: [
-      {
-        name: "channel",
-        description: "The channel to set slowmode for",
-        type: ApplicationCommandOptionType.Channel,
-        required: true,
-      },
-      {
-        name: "duration",
-        description: "The duration of the slowmode in seconds",
-        type: ApplicationCommandOptionType.Integer,
-        required: true,
-        min_value: 0,
-      },
-    ],
-  },
+  new SlashCommandBuilder()
+    .setName("expunge-message")
+    .setDescription(
+      "Deletes a specified amount of the latest messages from a channel"
+    )
+    .addIntegerOption((option) =>
+      option
+        .setName("amount")
+        .setDescription("The number of messages to delete")
+        .setRequired(true)
+        .setMinValue(1)
+        .setMaxValue(100)
+    )
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("The channel to delete messages from")
+        .setRequired(true)
+    ),
+  new SlashCommandBuilder()
+    .setName("kick-user")
+    .setDescription("Kicks a user from the server")
+    .addUserOption((option) =>
+      option
+        .setName("user")
+        .setDescription("The user to kick")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("reason")
+        .setDescription("The reason for kicking the user")
+        .setRequired(true)
+    ),
+  new SlashCommandBuilder()
+    .setName("ban-user")
+    .setDescription("Bans a user from the server")
+    .addUserOption((option) =>
+      option.setName("user").setDescription("The user to ban").setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("reason")
+        .setDescription("The reason for banning the user")
+        .setRequired(true)
+    ),
+  new SlashCommandBuilder()
+    .setName("mute-user")
+    .setDescription("Mutes a user for a specified duration")
+    .addUserOption((option) =>
+      option
+        .setName("user")
+        .setDescription("The user to mute")
+        .setRequired(true)
+    )
+    .addIntegerOption((option) =>
+      option
+        .setName("duration")
+        .setDescription("The duration of the mute (in seconds)")
+        .setRequired(true)
+        .setMinValue(1)
+    ),
+  new SlashCommandBuilder()
+    .setName("bad-word-filter")
+    .setDescription("Automatically deletes messages containing banned words")
+    .addBooleanOption((option) =>
+      option
+        .setName("toggle")
+        .setDescription("Enable or disable the bad word filter")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("word")
+        .setDescription("Words to filter")
+        .setRequired(false)
+    ),
+  new SlashCommandBuilder()
+    .setName("set-slowmode")
+    .setDescription("Sets a slowmode for a channel")
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("The channel to set slowmode for")
+        .setRequired(true)
+    )
+    .addIntegerOption((option) =>
+      option
+        .setName("duration")
+        .setDescription("The duration of the slowmode in seconds")
+        .setRequired(true)
+        .setMinValue(0)
+    ),
 
   // Mini Games
-  {
-    name: "flip-coin",
-    description: "Flips a coin and returns heads or tails",
-  },
-  {
-    name: "dice-roll",
-    description: "Rolls a dice and returns a number between 1 and 6",
-  },
-  {
-    name: "rock-paper-scissors",
-    description: "Play rock-paper-scissors with the bot",
-    options: [
-      {
-        name: "choice",
-        description: "Your choice (rock, paper, or scissors)",
-        type: ApplicationCommandOptionType.String,
-        required: true,
-        choices: [
+  new SlashCommandBuilder()
+    .setName("flip-coin")
+    .setDescription("Flips a coin and returns heads or tails"),
+  new SlashCommandBuilder()
+    .setName("dice-roll")
+    .setDescription("Rolls a dice and returns a number between 1 and 6"),
+  new SlashCommandBuilder()
+    .setName("rock-paper-scissors")
+    .setDescription("Play rock-paper-scissors with the bot")
+    .addStringOption((option) =>
+      option
+        .setName("choice")
+        .setDescription("Your choice (rock, paper, or scissors)")
+        .setRequired(true)
+        .addChoices(
           { name: "Rock", value: "rock" },
           { name: "Paper", value: "paper" },
-          { name: "Scissors", value: "scissors" },
-        ],
-      },
-    ],
-  },
+          { name: "Scissors", value: "scissors" }
+        )
+    ),
 
   // Extra commands
-  {
-    name: "dwayne-github",
-    description: "Takes you to Dwayne's GitHub",
-  },
-];
+  new SlashCommandBuilder()
+    .setName("dwayne-github")
+    .setDescription("Takes you to Dwayne's GitHub"),
+].map((command) => command.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
