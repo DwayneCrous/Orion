@@ -114,6 +114,25 @@ const commands = [
       },
     ],
   },
+  {
+    name: "mute-user",
+    description: "Mutes a user for a specified duration",
+    options: [
+      {
+        name: "user",
+        description: "The user to mute",
+        type: ApplicationCommandOptionType.User,
+        required: true,
+      },
+      {
+        name: "duration",
+        description: "The duration of the mute (in seconds)",
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+        min_value: 1,
+      },
+    ],
+  },
 
   // Mini Games
   {
