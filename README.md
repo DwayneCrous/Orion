@@ -11,6 +11,7 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 - **Currency Converter**: Convert amounts between currencies.
 - **Moderation Tools**: Kick, ban, mute users, bulk delete messages, and filter bad words (now with per-word toggling and detailed feedback).
 - **Bad Word Filter**: Enable or disable filtering of specific words, with instant moderation.
+- **Polls**: Create quick polls with custom questions, two options, and a timed voting period.
 - **Mini-Games**: Flip a coin, roll a dice, play rock-paper-scissors—all with interactive embeds.
 - **User Utilities**: Get any user's avatar with a single command.
 - **Extras**: Quick link to Dwayne's GitHub.
@@ -63,6 +64,14 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 ## 📋 Commands
 
 ### API & Utility Commands
+
+- `/get-avatar user:<user>`
+
+  - Get the avatar of any user.
+
+- `/create-poll question:<string> option1:<string> option2:<string> duration:<minutes>`
+
+  - Create a poll with a custom question, two options, and a voting duration (in minutes). Users vote by reacting with 🟩 or 🟦. The bot announces the result when the poll ends.
 
 - `/todays-overview`
   - Get a daily overview with weather and top 3 news headlines for South Africa.
