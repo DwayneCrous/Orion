@@ -14,7 +14,7 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 - **Nickname Management**: Set user nicknames easily.
 - **Slowmode Control**: Set slowmode for any text channel.
 - **Bad Word Filter**: Enable or disable filtering of specific words, with instant moderation.
-- **Mini-Games**: Flip a coin, roll a dice, play rock-paper-scissors—all with interactive embeds.
+- **Mini-Games**: Flip a coin, roll a dice, play rock-paper-scissors.
 - **User Utilities**: Get any user's avatar with a single command.
 - **Extras**: Quick link to Dwayne's GitHub.
 
@@ -100,7 +100,7 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 ### Mini-Games
 
 - `/flip-coin`  
-  Flip a coin and get the result in an interactive embed.
+  Flip a coin and get the result in an embed.
 - `/dice-roll`  
   Roll a dice (1-6) and see the result in an embed.
 - `/rock-paper-scissors choice:<rock|paper|scissors>`  
