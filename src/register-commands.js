@@ -167,6 +167,21 @@ const commands = [
         .setRequired(true)
         .setMinValue(0)
     ),
+  new SlashCommandBuilder()
+    .setName("set-nickname")
+    .setDescription("Sets a user's nickname for the server")
+    .addUserOption((option) =>
+      option
+        .setName("user")
+        .setDescription("The user to set the nickname for")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("nickname")
+        .setDescription("The new nickname")
+        .setRequired(true)
+    ),
 
   // Mini Games
   new SlashCommandBuilder()
