@@ -49,6 +49,72 @@ client.on("messageCreate", (message) => {
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
+  // Server utility commands
+  if (interaction.commandName === "todays-overview") {
+    await interaction.deferReply({});
+
+    const getWeather = async (city) => {
+      const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${process.env.WEATHER_API_KEY}`
+      );
+      const data = await res.json();
+
+      if (data.cod !== 200) throw new Error("Failed to fetch weather");
+      return {
+        temp: data.main.temp,
+        desc: data.weather[0].description,
+        location: data.name,
+      };
+    };
+
+    const getNews = async () => {
+      const res = await fetch(
+        `https://newsapi.org/v2/top-headlines?country=za&pageSize=3&apiKey=${process.env.NEWS_API_KEY}`
+      );
+      const data = await res.json();
+
+      if (data.status !== "ok") throw new Error("Failed to fetch news");
+
+      return data.articles.map((a) => ({
+        title: a.title,
+        source: a.source.name,
+        url: a.url,
+      }));
+    };
+
+    const user = interaction.user.username;
+    const embed = new EmbedBuilder()
+      .setColor("#40a02b")
+      .setTimestamp()
+      .setTitle(`Good morning ${user}, here's what is happening today!`);
+
+    try {
+      const weather = await getWeather("Port Elizabeth");
+      const news = await getNews();
+
+      embed.setDescription(
+        `**🌤 Weather in ${weather.location}**\n${weather.temp}°C, ${weather.desc}\n`
+      );
+
+      embed.addFields({
+        name: "📰 Latest News Headlines",
+        value: news
+          .map(
+            (article) =>
+              `• [${article.title}](${article.url}) — *${article.source}*`
+          )
+          .join("\n"),
+      });
+    } catch (err) {
+      console.error("❌ Overview error:", err);
+      embed.setDescription(
+        "⚠️ Couldn't fetch today's overview. Try again later."
+      );
+    }
+
+    await interaction.editReply({ embeds: [embed] });
+  }
+
   // API commands
   if (interaction.commandName === "get-weather") {
     const location = interaction.options.getString("location");

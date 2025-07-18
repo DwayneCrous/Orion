@@ -2,6 +2,12 @@ require("dotenv").config();
 const { REST, Routes, ApplicationCommandOptionType } = require("discord.js");
 
 const commands = [
+  // Server utility commands
+  {
+    name: "todays-overview",
+    description: "Provides an overview of today's weather and latest news",
+  },
+
   // API commands
   {
     name: "get-weather",
