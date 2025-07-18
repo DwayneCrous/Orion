@@ -173,6 +173,25 @@ const commands = [
       },
     ],
   },
+  {
+    name: "set-slowmode",
+    description: "Sets a slowmode for a channel",
+    options: [
+      {
+        name: "channel",
+        description: "The channel to set slowmode for",
+        type: ApplicationCommandOptionType.Channel,
+        required: true,
+      },
+      {
+        name: "duration",
+        description: "The duration of the slowmode in seconds",
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+        min_value: 0,
+      },
+    ],
+  },
 
   // Mini Games
   {
