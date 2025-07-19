@@ -9,6 +9,7 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 - **Weather API**: Get current weather for any location.
 
 - **Bot Updates**: Announce new features and bot changes interactively, with preview and @here notification.
+- **Server Info**: Get information about the server, including member count and creation date.
 - **News Headlines**: Get the top 3 latest news headlines for South Africa in the daily overview.
 - **Currency Converter**: Convert amounts between currencies.
 - **Moderation Tools**: Kick, ban, mute users, bulk delete messages, and filter bad words (now with per-word toggling and detailed feedback).
@@ -87,6 +88,8 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
   - Convert currency amounts.
 - `/get-avatar user:<user>`
   - Get the avatar of any user.
+- `/server-info`
+  - Get information about the server, including member count, creation date and server owner.
 
 ### Moderation
 
