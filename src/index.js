@@ -1,25 +1,13 @@
 require("dotenv").config();
-
-const { Client, IntentsBitField, EmbedBuilder, Embed } = require("discord.js");
-const todaysOverview = require("./commands/todays-overview");
-const getAvatar = require("./commands/get-avatar");
-const setRole = require("./commands/set-role");
-const createPoll = require("./commands/create-poll");
-const getServerInfo = require("./commands/get-server-info");
-const botUpdates = require("./commands/bot-updates");
-const getWeather = require("./commands/get-weather");
-const currencyConvert = require("./commands/currency-convert");
-const expungeMessage = require("./commands/expunge-message");
-const kickUser = require("./commands/kick-user");
-const banUser = require("./commands/ban-user");
-const muteUser = require("./commands/mute-user");
-const badWordFilter = require("./commands/bad-word-filter");
-const setSlowmode = require("./commands/set-slowmode");
-const setNickname = require("./commands/set-nickname");
-const flipCoin = require("./commands/flip-coin");
-const diceRoll = require("./commands/dice-roll");
-const rockPaperScissors = require("./commands/rock-paper-scissors");
-const dwayneGithub = require("./commands/dwayne-github");
+const fs = require("node:fs");
+const path = require("node:path");
+const {
+  Client,
+  Collection,
+  IntentsBitField,
+  Events,
+  MessageFlags,
+} = require("discord.js");
 
 const client = new Client({
   intents: [
@@ -29,6 +17,25 @@ const client = new Client({
     IntentsBitField.Flags.MessageContent,
   ],
 });
+
+client.commands = new Collection();
+
+const commandsPath = path.join(__dirname, "commands");
+const commandFiles = fs
+  .readdirSync(commandsPath)
+  .filter((file) => file.endsWith(".js"));
+
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = require(filePath);
+  if ("data" in command && "execute" in command) {
+    client.commands.set(command.data.name, command);
+  } else {
+    console.log(
+      `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+    );
+  }
+}
 
 client.on("ready", (c) => {
   console.log(`✅ ${c.user.tag} is online successfully!`);
@@ -44,69 +51,31 @@ client.on("ready", (c) => {
 //   }
 // });
 
-// bad word filter feature
-client.on("messageCreate", async (message) => {
-  if (message.author.bot || !message.guild) return;
-  const filter = client.badWordFilter || [];
-  if (!filter.length) return;
-  const content = message.content.toLowerCase();
-  for (const word of filter) {
-    if (content.includes(word.toLowerCase())) {
-      try {
-        await message.delete();
-        await message.channel.send({
-          content: `HEY, <@${message.author.id}>! Watch your language! The word **${word}** is not allowed here.`,
-        });
-      } catch (err) {
-        console.error("Failed to delete message:", err);
-      }
-      break;
-    }
-  }
-});
+// ...existing code for bad word filter feature...
 
-client.on("interactionCreate", async (interaction) => {
+client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  const commandMap = {
-    "todays-overview": todaysOverview,
-    "get-avatar": getAvatar,
-    "set-role": setRole,
-    "create-poll": createPoll,
-    "get-server-info": getServerInfo,
-    "bot-updates": botUpdates,
-    "get-weather": getWeather,
-    "currency-convert": currencyConvert,
-    "expunge-message": expungeMessage,
-    "kick-user": kickUser,
-    "ban-user": banUser,
-    "mute-user": muteUser,
-    "bad-word-filter": badWordFilter,
-    "set-slowmode": setSlowmode,
-    "set-nickname": setNickname,
-    "flip-coin": flipCoin,
-    "dice-roll": diceRoll,
-    "rock-paper-scissors": rockPaperScissors,
-    "dwayne-github": dwayneGithub,
-  };
+  const command = interaction.client.commands.get(interaction.commandName);
 
-  const command = commandMap[interaction.commandName];
   if (!command) {
-    await interaction.reply({ content: "Unknown command.", ephemeral: true });
+    console.error(`No command matching ${interaction.commandName} was found.`);
     return;
   }
+
   try {
-    await command(interaction, client);
-  } catch (err) {
-    console.error(err);
-    if (interaction.deferred || interaction.replied) {
-      await interaction.editReply({
-        content: "There was an error executing this command.",
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({
+        content: "There was an error while executing this command!",
+        flags: MessageFlags.Ephemeral,
       });
     } else {
       await interaction.reply({
-        content: "There was an error executing this command.",
-        ephemeral: true,
+        content: "There was an error while executing this command!",
+        flags: MessageFlags.Ephemeral,
       });
     }
   }

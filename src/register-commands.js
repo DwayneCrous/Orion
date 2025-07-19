@@ -1,285 +1,47 @@
+const fs = require("node:fs");
+const path = require("node:path");
+const { REST, Routes } = require("discord.js");
+
 require("dotenv").config();
-const { REST, Routes, SlashCommandBuilder } = require("discord.js");
+const clientId = process.env.CLIENT_ID;
+const guildId = process.env.GUILD_ID;
+const token = process.env.TOKEN;
 
-const commands = [
-  // Server utility commands
-  new SlashCommandBuilder()
-    .setName("todays-overview")
-    .setDescription("Provides an overview of today's weather and latest news"),
-  new SlashCommandBuilder()
-    .setName("get-avatar")
-    .setDescription("Gets the avatar of a user")
-    .addUserOption((option) =>
-      option
-        .setName("user")
-        .setDescription("The user to get the avatar of")
-        .setRequired(true)
-    ),
-  new SlashCommandBuilder()
-    .setName("set-role")
-    .setDescription("Assigns a role to a specified member")
-    .addRoleOption((option) =>
-      option
-        .setName("role")
-        .setDescription("The role to assign to the member")
-        .setRequired(true)
-    )
-    .addUserOption((option) =>
-      option
-        .setName("member")
-        .setDescription("The member to assign the role to")
-        .setRequired(true)
-    ),
-  new SlashCommandBuilder()
-    .setName("create-poll")
-    .setDescription("Creates a poll with the specified question and options")
-    .addStringOption((option) =>
-      option
-        .setName("question")
-        .setDescription("The question for the poll")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("option1")
-        .setDescription("The first option for the poll")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("option2")
-        .setDescription("The second option for the poll")
-        .setRequired(true)
-    )
-    .addIntegerOption((option) =>
-      option
-        .setName("duration")
-        .setDescription("The duration of the poll")
-        .setRequired(true)
-        .addChoices(
-          { name: "1 min", value: 1 },
-          { name: "2 min", value: 2 },
-          { name: "5 min", value: 5 },
-          { name: "10 min", value: 10 },
-          { name: "20 min", value: 20 },
-          { name: "30 min", value: 30 },
-          { name: "1 hour", value: 60 },
-          { name: "2 hour", value: 120 },
-          { name: "5 hour", value: 300 },
-          { name: "10 hour", value: 600 },
-          { name: "1 day", value: 1440 }
-        )
-    ),
-  new SlashCommandBuilder()
-    .setName("get-server-info")
-    .setDescription("Provides information about the server"),
+const commands = [];
+const commandsPath = path.join(__dirname, "commands");
+const commandFiles = fs
+  .readdirSync(commandsPath)
+  .filter((file) => file.endsWith(".js"));
 
-  // Bot utility commands
-  new SlashCommandBuilder()
-    .setName("bot-updates")
-    .setDescription("Provides updates about the bot's status and features")
-    .addStringOption((option) =>
-      option
-        .setName("update")
-        .setDescription("(Optional) Prefill the update message for editing")
-        .setRequired(false)
-    ),
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = require(filePath);
+  if ("data" in command && "execute" in command) {
+    commands.push(command.data.toJSON());
+  } else {
+    console.log(
+      `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+    );
+  }
+}
 
-  // API commands
-  new SlashCommandBuilder()
-    .setName("get-weather")
-    .setDescription("Gets the current weather for a location")
-    .addStringOption((option) =>
-      option
-        .setName("location")
-        .setDescription("The location to get the weather for")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("units")
-        .setDescription("The units for the temperature")
-        .setRequired(true)
-        .addChoices(
-          { name: "Celsius", value: "metric" },
-          { name: "Fahrenheit", value: "imperial" }
-        )
-    ),
-  new SlashCommandBuilder()
-    .setName("currency-convert")
-    .setDescription("Converts an amount from one currency to another")
-    .addNumberOption((option) =>
-      option
-        .setName("amount")
-        .setDescription("The amount to convert")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("from_currency")
-        .setDescription("The currency to convert from")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("to_currency")
-        .setDescription("The currency to convert to")
-        .setRequired(true)
-    ),
-
-  // Moderation commands
-  new SlashCommandBuilder()
-    .setName("expunge-message")
-    .setDescription(
-      "Deletes a specified amount of the latest messages from a channel"
-    )
-    .addIntegerOption((option) =>
-      option
-        .setName("amount")
-        .setDescription("The number of messages to delete")
-        .setRequired(true)
-        .setMinValue(1)
-        .setMaxValue(100)
-    )
-    .addChannelOption((option) =>
-      option
-        .setName("channel")
-        .setDescription("The channel to delete messages from")
-        .setRequired(true)
-    ),
-  new SlashCommandBuilder()
-    .setName("kick-user")
-    .setDescription("Kicks a user from the server")
-    .addUserOption((option) =>
-      option
-        .setName("user")
-        .setDescription("The user to kick")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("reason")
-        .setDescription("The reason for kicking the user")
-        .setRequired(true)
-    ),
-  new SlashCommandBuilder()
-    .setName("ban-user")
-    .setDescription("Bans a user from the server")
-    .addUserOption((option) =>
-      option.setName("user").setDescription("The user to ban").setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("reason")
-        .setDescription("The reason for banning the user")
-        .setRequired(true)
-    ),
-  new SlashCommandBuilder()
-    .setName("mute-user")
-    .setDescription("Mutes a user for a specified duration")
-    .addUserOption((option) =>
-      option
-        .setName("user")
-        .setDescription("The user to mute")
-        .setRequired(true)
-    )
-    .addIntegerOption((option) =>
-      option
-        .setName("duration")
-        .setDescription("The duration of the mute (in seconds)")
-        .setRequired(true)
-        .setMinValue(1)
-    ),
-  new SlashCommandBuilder()
-    .setName("bad-word-filter")
-    .setDescription("Automatically deletes messages containing banned words")
-    .addBooleanOption((option) =>
-      option
-        .setName("toggle")
-        .setDescription("Enable or disable the bad word filter")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option.setName("word").setDescription("Words to filter").setRequired(true)
-    ),
-  new SlashCommandBuilder()
-    .setName("set-slowmode")
-    .setDescription("Sets a slowmode for a channel")
-    .addChannelOption((option) =>
-      option
-        .setName("channel")
-        .setDescription("The channel to set slowmode for")
-        .setRequired(true)
-    )
-    .addIntegerOption((option) =>
-      option
-        .setName("duration")
-        .setDescription("The duration of the slowmode in seconds")
-        .setRequired(true)
-        .setMinValue(0)
-    ),
-  new SlashCommandBuilder()
-    .setName("set-nickname")
-    .setDescription("Sets a user's nickname for the server")
-    .addUserOption((option) =>
-      option
-        .setName("user")
-        .setDescription("The user to set the nickname for")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("nickname")
-        .setDescription("The new nickname")
-        .setRequired(true)
-    ),
-
-  // Mini Games
-  new SlashCommandBuilder()
-    .setName("flip-coin")
-    .setDescription("Flips a coin and returns heads or tails"),
-  new SlashCommandBuilder()
-    .setName("dice-roll")
-    .setDescription("Rolls a dice and returns a number between 1 and 6"),
-  new SlashCommandBuilder()
-    .setName("rock-paper-scissors")
-    .setDescription("Play rock-paper-scissors with the bot")
-    .addStringOption((option) =>
-      option
-        .setName("choice")
-        .setDescription("Your choice (rock, paper, or scissors)")
-        .setRequired(true)
-        .addChoices(
-          { name: "Rock", value: "rock" },
-          { name: "Paper", value: "paper" },
-          { name: "Scissors", value: "scissors" }
-        )
-    ),
-
-  // Extra commands
-  new SlashCommandBuilder()
-    .setName("dwayne-github")
-    .setDescription("Takes you to Dwayne's GitHub"),
-].map((command) => command.toJSON());
-
-const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
+const rest = new REST({ version: "10" }).setToken(token);
 
 (async () => {
   try {
-    console.log("⏳ Registering slash commands...");
-
-    await rest.put(
-      Routes.applicationGuildCommands(
-        process.env.CLIENT_ID,
-        process.env.GUILD_ID
-      ),
-      {
-        body: commands,
-      }
+    console.log(
+      `⏳ Started refreshing ${commands.length} application (/) commands.`
     );
 
-    console.log("✅ Slash commands registered successfully!");
+    const data = await rest.put(
+      Routes.applicationGuildCommands(clientId, guildId),
+      { body: commands }
+    );
+
+    console.log(
+      `✅ Successfully reloaded ${data.length} application (/) commands.`
+    );
   } catch (error) {
-    console.log(`❌ Error registering commands: ${error}`);
+    console.error(error);
   }
 })();
