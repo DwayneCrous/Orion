@@ -57,6 +57,9 @@ const commands = [
         .setDescription("The duration of the poll in minutes")
         .setRequired(true)
     ),
+  new SlashCommandBuilder()
+    .setName("get-server-info")
+    .setDescription("Provides information about the server"),
 
   // Bot utility commands
   new SlashCommandBuilder()

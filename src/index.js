@@ -61,7 +61,6 @@ client.on("interactionCreate", async (interaction) => {
       return "Good evening";
     }
 
-    // Weather fetch function
     const getWeather = async (city) => {
       const res = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${process.env.WEATHER_API_KEY}`
@@ -77,7 +76,6 @@ client.on("interactionCreate", async (interaction) => {
       };
     };
 
-    // News fetch function
     const getNews = async () => {
       const res = await fetch(
         `https://newsapi.org/v2/everything?q=south+africa&sortBy=publishedAt&pageSize=3&apiKey=${process.env.NEWS_API_KEY}`
@@ -269,6 +267,36 @@ client.on("interactionCreate", async (interaction) => {
         console.error("❌ Error ending poll:", err);
       }
     }, duration * 60 * 1000);
+  }
+
+  if (interaction.commandName === "get-server-info") {
+    await interaction.deferReply({});
+
+    const guild = interaction.guild;
+    if (!guild) {
+      await interaction.editReply(
+        "⚠️ This command can only be used in a server."
+      );
+      return;
+    }
+    const embed = new EmbedBuilder()
+      .setTitle(`Server Info: ${guild.name}`)
+      .setThumbnail(guild.iconURL({ size: 512, dynamic: true }))
+      .setColor("#04a5e5")
+      .addFields(
+        { name: "Server ID", value: guild.id, inline: true },
+        { name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
+        { name: "Member Count", value: `${guild.memberCount}`, inline: true },
+        {
+          name: "Created At",
+          value: guild.createdAt.toDateString(),
+          inline: true,
+        }
+      )
+      .setFooter({ text: "Server Information" })
+      .setTimestamp();
+
+    await interaction.editReply({ embeds: [embed] });
   }
 
   // Bot utility commands
