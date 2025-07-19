@@ -41,6 +41,36 @@ client.on("ready", (c) => {
   console.log(`✅ ${c.user.tag} is online successfully!`);
 });
 
+client.on(Events.GuildMemberAdd, async (member) => {
+  const channelId = process.env.WELCOME_CHANNEL_ID;
+  const channel = member.guild.channels.cache.get(channelId);
+  if (!channel) return;
+
+  try {
+    await channel.send({
+      embeds: [
+        {
+          title: "Welcome!",
+          description: `We're glad to have you here, <@${member.id}>!`,
+          color: 0x209fb5,
+          thumbnail: {
+            url: member.user.displayAvatarURL({ dynamic: true, size: 512 }),
+          },
+          fields: [
+            {
+              name: "User",
+              value: `<@${member.id}>`,
+              inline: true,
+            },
+          ],
+        },
+      ],
+    });
+  } catch (err) {
+    console.error("Failed to send welcome message:", err);
+  }
+});
+
 // client.on("messageCreate", (message) => {
 //   if (message.author.bot) {
 //     return;
