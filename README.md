@@ -7,6 +7,8 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 ## 🚀 Features
 
 - **Weather API**: Get current weather for any location.
+
+- **Bot Updates**: Announce new features and bot changes interactively, with preview and @here notification.
 - **News Headlines**: Get the top 3 latest news headlines for South Africa in the daily overview.
 - **Currency Converter**: Convert amounts between currencies.
 - **Moderation Tools**: Kick, ban, mute users, bulk delete messages, and filter bad words (now with per-word toggling and detailed feedback).
@@ -65,6 +67,10 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 
 ### API & Utility Commands
 
+- `/bot-updates [update:<string>]`
+
+  - Interactively compose and preview a bot update announcement. Edit the message before sending, then notify everyone online in the current channel with an embed and @here mention.
+
 - `/get-avatar user:<user>`
 
   - Get the avatar of any user.
@@ -98,7 +104,7 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 ### Mini-Games
 
 - `/flip-coin`
-  - Flip a coin and get the result in an interactive embed.
+  - Flip a coin and get the result in an embed.
 - `/dice-roll`
   - Roll a dice (1-6) and see the result in an embed.
 - `/rock-paper-scissors choice:<rock|paper|scissors>`

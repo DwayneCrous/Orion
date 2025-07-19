@@ -291,7 +291,6 @@ client.on("interactionCreate", async (interaction) => {
       ModalBuilder,
       TextInputBuilder,
       TextInputStyle,
-      ChannelType,
     } = require("discord.js");
 
     const previewEmbed = buildEmbed(
