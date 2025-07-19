@@ -125,7 +125,7 @@ Pull requests and suggestions are welcome! Please open an issue for major change
 
 ## 📄 License
 
-This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0). See the LICENSE file for details.
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
 
 ---
 
