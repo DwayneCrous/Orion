@@ -279,7 +279,7 @@ client.on("interactionCreate", async (interaction) => {
 
     const buildEmbed = (desc) =>
       new EmbedBuilder()
-        .setTitle("🔧 Bot Updates")
+        .setTitle("🥳 New Features added!")
         .setDescription(desc)
         .setColor("#04a5e5")
         .setFooter({ text: "Bot Updates" });
