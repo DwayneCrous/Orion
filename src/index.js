@@ -271,6 +271,125 @@ client.on("interactionCreate", async (interaction) => {
     }, duration * 60 * 1000);
   }
 
+  // Bot utility commands
+  if (interaction.commandName === "bot-updates") {
+    await interaction.deferReply({ flags: "Ephemeral" });
+
+    let updateMessage = interaction.options.getString("update") || "";
+
+    const buildEmbed = (desc) =>
+      new EmbedBuilder()
+        .setTitle("🔧 Bot Updates")
+        .setDescription(desc)
+        .setColor("#04a5e5")
+        .setFooter({ text: "Bot Updates" });
+
+    const {
+      ActionRowBuilder,
+      ButtonBuilder,
+      ButtonStyle,
+      ModalBuilder,
+      TextInputBuilder,
+      TextInputStyle,
+      ChannelType,
+    } = require("discord.js");
+
+    const previewEmbed = buildEmbed(
+      updateMessage || "_No update message provided yet._"
+    );
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("botupdates_send")
+        .setLabel("Send to Server")
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(!updateMessage),
+      new ButtonBuilder()
+        .setCustomId("botupdates_edit")
+        .setLabel("Edit")
+        .setStyle(ButtonStyle.Primary)
+    );
+
+    await interaction.editReply({
+      content: "Here is your update preview. You can edit or send it:",
+      embeds: [previewEmbed],
+      components: [row],
+      Ephemeral: true,
+    });
+
+    const filter = (i) => i.user.id === interaction.user.id;
+    const collector = interaction.channel.createMessageComponentCollector({
+      filter,
+      time: 5 * 60 * 1000,
+      componentType: 2,
+    });
+
+    collector.on("collect", async (btnInt) => {
+      if (btnInt.customId === "botupdates_edit") {
+        const modal = new ModalBuilder()
+          .setCustomId("botupdates_modal")
+          .setTitle("Edit Bot Update");
+        const input = new TextInputBuilder()
+          .setCustomId("botupdates_input")
+          .setLabel("Update Message")
+          .setStyle(TextInputStyle.Paragraph)
+          .setRequired(true)
+          .setMaxLength(1024)
+          .setValue(updateMessage);
+        modal.addComponents(new ActionRowBuilder().addComponents(input));
+        await btnInt.showModal(modal);
+      } else if (btnInt.customId === "botupdates_send") {
+        const targetChannel = interaction.guild.channels.cache.find(
+          (ch) =>
+            ch.type === ChannelType.GuildText &&
+            ch.viewable &&
+            ch.permissionsFor(client.user).has("SendMessages")
+        );
+        if (!targetChannel) {
+          await btnInt.reply({
+            content:
+              "❌ No suitable public text channel found to send the update.",
+            Ephemeral: true,
+          });
+          return;
+        }
+        await targetChannel.send({
+          content: "@here",
+          embeds: [buildEmbed(updateMessage)],
+        });
+        await btnInt.reply({
+          content: "✅ Update sent to the server!",
+          flags: "Ephemeral",
+        });
+        collector.stop();
+      }
+    });
+
+    client.on("interactionCreate", async (modalInt) => {
+      if (!modalInt.isModalSubmit()) return;
+      if (modalInt.customId !== "botupdates_modal") return;
+      if (modalInt.user.id !== interaction.user.id) return;
+      updateMessage = modalInt.fields.getTextInputValue("botupdates_input");
+
+      const newRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId("botupdates_send")
+          .setLabel("Send to Server")
+          .setStyle(ButtonStyle.Success)
+          .setDisabled(!updateMessage),
+        new ButtonBuilder()
+          .setCustomId("botupdates_edit")
+          .setLabel("Edit")
+          .setStyle(ButtonStyle.Primary)
+      );
+      await modalInt.update({
+        content: "Here is your update preview. You can edit or send it:",
+        embeds: [buildEmbed(updateMessage)],
+        components: [newRow],
+        Ephemeral: true,
+      });
+    });
+  }
+
   // API commands
   if (interaction.commandName === "get-weather") {
     const location = interaction.options.getString("location");

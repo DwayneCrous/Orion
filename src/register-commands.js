@@ -58,6 +58,17 @@ const commands = [
         .setRequired(true)
     ),
 
+  // Bot utility commands
+  new SlashCommandBuilder()
+    .setName("bot-updates")
+    .setDescription("Provides updates about the bot's status and features")
+    .addStringOption((option) =>
+      option
+        .setName("update")
+        .setDescription("(Optional) Prefill the update message for editing")
+        .setRequired(false)
+    ),
+
   // API commands
   new SlashCommandBuilder()
     .setName("get-weather")
