@@ -338,21 +338,15 @@ client.on("interactionCreate", async (interaction) => {
         modal.addComponents(new ActionRowBuilder().addComponents(input));
         await btnInt.showModal(modal);
       } else if (btnInt.customId === "botupdates_send") {
-        const targetChannel = interaction.guild.channels.cache.find(
-          (ch) =>
-            ch.type === ChannelType.GuildText &&
-            ch.viewable &&
-            ch.permissionsFor(client.user).has("SendMessages")
-        );
-        if (!targetChannel) {
+        // Send to the channel where the command was run
+        if (!interaction.channel || !interaction.channel.isTextBased()) {
           await btnInt.reply({
-            content:
-              "❌ No suitable public text channel found to send the update.",
-            Ephemeral: true,
+            content: "❌ Could not send update: this is not a text channel.",
+            ephemeral: true,
           });
           return;
         }
-        await targetChannel.send({
+        await interaction.channel.send({
           content: "@here",
           embeds: [buildEmbed(updateMessage)],
         });
