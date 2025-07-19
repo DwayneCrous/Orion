@@ -214,14 +214,29 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
+    // Helper to format duration
+    function formatDuration(minutes) {
+      if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+      if (minutes < 1440) {
+        const hours = minutes / 60;
+        return `${hours % 1 === 0 ? hours : hours.toFixed(1)} hour${
+          hours === 1 ? "" : "s"
+        }`;
+      }
+      const days = minutes / 1440;
+      return `${days % 1 === 0 ? days : days.toFixed(1)} day${
+        days === 1 ? "" : "s"
+      }`;
+    }
+
     const embed = new EmbedBuilder()
       .setTitle(`Poll: ${question}`)
       .setDescription(`🟩 ${option1}\n🟦 ${option2}`)
       .setColor("#179299")
       .setFooter({
-        text: `React with 🟩 or 🟦 to vote! Poll ends in ${duration} minute${
-          duration === 1 ? "" : "s"
-        }.`,
+        text: `React with 🟩 or 🟦 to vote! Poll ends in ${formatDuration(
+          duration
+        )}.`,
       });
 
     const pollMessage = await interaction.editReply({
@@ -282,7 +297,7 @@ client.on("interactionCreate", async (interaction) => {
     const embed = new EmbedBuilder()
       .setTitle(`Server Info: ${guild.name}`)
       .setThumbnail(guild.iconURL({ size: 512, dynamic: true }))
-      .setColor("#04a5e5")
+      .setColor("#209fb5")
       .addFields(
         { name: "Server ID", value: guild.id, inline: true },
         { name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
