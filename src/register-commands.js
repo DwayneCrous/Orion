@@ -200,10 +200,7 @@ const commands = [
         .setRequired(true)
     )
     .addStringOption((option) =>
-      option
-        .setName("word")
-        .setDescription("Words to filter")
-        .setRequired(false)
+      option.setName("word").setDescription("Words to filter").setRequired(true)
     ),
   new SlashCommandBuilder()
     .setName("set-slowmode")
