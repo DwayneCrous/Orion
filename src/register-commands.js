@@ -51,11 +51,24 @@ const commands = [
         .setDescription("The second option for the poll")
         .setRequired(true)
     )
-    .addNumberOption((option) =>
+    .addIntegerOption((option) =>
       option
         .setName("duration")
-        .setDescription("The duration of the poll in minutes")
+        .setDescription("The duration of the poll")
         .setRequired(true)
+        .addChoices(
+          { name: "1 min", value: 1 },
+          { name: "2 min", value: 2 },
+          { name: "5 min", value: 5 },
+          { name: "10 min", value: 10 },
+          { name: "20 min", value: 20 },
+          { name: "30 min", value: 30 },
+          { name: "1 hour", value: 60 },
+          { name: "2 hour", value: 120 },
+          { name: "5 hour", value: 300 },
+          { name: "10 hour", value: 600 },
+          { name: "1 day", value: 1440 }
+        )
     ),
   new SlashCommandBuilder()
     .setName("get-server-info")

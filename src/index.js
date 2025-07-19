@@ -205,7 +205,7 @@ client.on("interactionCreate", async (interaction) => {
     const question = interaction.options.getString("question");
     const option1 = interaction.options.getString("option1");
     const option2 = interaction.options.getString("option2");
-    const duration = interaction.options.getNumber("duration");
+    const duration = interaction.options.getInteger("duration");
 
     if (!question || !option1 || !option2 || !duration) {
       await interaction.editReply(
