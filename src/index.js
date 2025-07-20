@@ -57,6 +57,7 @@ const client = new Client({
     IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.MessageContent,
+    IntentsBitField.Flags.GuildPresences,
   ],
 });
 
@@ -83,7 +84,6 @@ client.on("ready", (c) => {
   console.log(`✅ ${c.user.tag} is online successfully!`);
   loadRemindersOnStartup(client);
 
-  // Birthday announcement feature
   const fs = require("fs");
   const path = require("path");
   const dataDir = path.join(__dirname, "../data");
@@ -174,7 +174,24 @@ client.on(Events.GuildMemberAdd, async (member) => {
 //   }
 // });
 
-// ...existing code for bad word filter feature...
+client.on("messageCreate", async (message) => {
+  if (message.author.bot) return;
+  if (!message.guild) return;
+  let member;
+  try {
+    member = await message.guild.members.fetch(message.author.id);
+  } catch {
+    return;
+  }
+  const presence = member.presence;
+  if (!presence) return;
+  const status = presence.status;
+  if (["offline", "idle", "dnd"].includes(status)) {
+    await message.reply(
+      "https://cdn.discordapp.com/attachments/1269017675544268852/1396456663027941497/5ltbz8.png?ex=687e271d&is=687cd59d&hm=1fccf934b7ff80b5b9392191bdc659b286ae723b73158464109241a84f5ed613&"
+    );
+  }
+});
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
