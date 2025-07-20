@@ -1,6 +1,48 @@
 require("dotenv").config();
 const fs = require("node:fs");
 const path = require("node:path");
+
+const remindersPath = path.join(__dirname, "../data/reminders.json");
+function loadRemindersOnStartup(client) {
+  if (!fs.existsSync(remindersPath)) return;
+  let reminders = [];
+  try {
+    const raw = fs.readFileSync(remindersPath, "utf8");
+    reminders = JSON.parse(raw);
+  } catch (err) {
+    reminders = [];
+  }
+  const now = Date.now();
+  reminders.forEach((reminder) => {
+    const delay = reminder.remindAt - now;
+    if (delay <= 0) {
+      const channel = client.channels.cache.get(reminder.channelId);
+      if (channel) {
+        channel.send(`<@${reminder.userId}> 🔔 Reminder: ${reminder.message}`);
+      }
+    } else {
+      setTimeout(() => {
+        const channel = client.channels.cache.get(reminder.channelId);
+        if (channel) {
+          channel.send(
+            `<@${reminder.userId}> 🔔 Reminder: ${reminder.message}`
+          );
+        }
+
+        let reminders = [];
+        try {
+          const raw = fs.readFileSync(remindersPath, "utf8");
+          reminders = JSON.parse(raw);
+        } catch (err) {}
+        reminders = reminders.filter(
+          (r) =>
+            r.remindAt !== reminder.remindAt || r.userId !== reminder.userId
+        );
+        fs.writeFileSync(remindersPath, JSON.stringify(reminders, null, 2));
+      }, delay);
+    }
+  });
+}
 const {
   Client,
   Collection,
@@ -39,6 +81,7 @@ for (const file of commandFiles) {
 
 client.on("ready", (c) => {
   console.log(`✅ ${c.user.tag} is online successfully!`);
+  loadRemindersOnStartup(client);
 
   // Birthday announcement feature
   const fs = require("fs");

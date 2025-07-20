@@ -57,8 +57,40 @@ module.exports = {
         return;
     }
 
+    const fs = require("fs");
+    const path = require("path");
+    const dataDir = path.join(__dirname, "../../data");
+    const remindersPath = path.join(dataDir, "reminders.json");
+
+    let reminders = [];
+    if (fs.existsSync(remindersPath)) {
+      try {
+        const raw = fs.readFileSync(remindersPath, "utf8");
+        reminders = JSON.parse(raw);
+      } catch (err) {
+        reminders = [];
+      }
+    }
+
+    const remindAt = Date.now() + milliseconds;
+    const reminder = {
+      userId: interaction.user.id,
+      channelId: interaction.channelId,
+      message,
+      remindAt,
+      timeInput,
+    };
+    reminders.push(reminder);
+    fs.writeFileSync(remindersPath, JSON.stringify(reminders, null, 2));
+
     setTimeout(() => {
       interaction.followUp(`🔔 Reminder: ${message}`);
+
+      let updatedReminders = reminders.filter((r) => r !== reminder);
+      fs.writeFileSync(
+        remindersPath,
+        JSON.stringify(updatedReminders, null, 2)
+      );
     }, milliseconds);
 
     await interaction.editReply(
