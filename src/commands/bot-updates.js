@@ -18,7 +18,7 @@ module.exports = {
       option
         .setName("update")
         .setDescription("Update message")
-        .setRequired(true)
+        .setRequired(false)
     ),
   async execute(interaction) {
     const client = interaction.client;
