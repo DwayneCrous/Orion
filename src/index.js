@@ -39,6 +39,56 @@ for (const file of commandFiles) {
 
 client.on("ready", (c) => {
   console.log(`✅ ${c.user.tag} is online successfully!`);
+
+  // Birthday announcement feature
+  const fs = require("fs");
+  const path = require("path");
+  const dataDir = path.join(__dirname, "../data");
+  const birthdaysPath = path.join(dataDir, "birthdays.json");
+  const channelId = process.env.BIRTHDAY_CHANNEL_ID;
+
+  const checkBirthdays = async () => {
+    if (!fs.existsSync(birthdaysPath)) return;
+    let birthdays = {};
+    try {
+      const raw = fs.readFileSync(birthdaysPath, "utf8");
+      birthdays = JSON.parse(raw);
+    } catch (err) {
+      return;
+    }
+
+    const today = new Date();
+    const todayStr = today.toISOString().slice(5, 10);
+    const birthdayUsers = Object.entries(birthdays)
+      .filter(([_, date]) => {
+        const parts = date.split(/[-\/]/);
+        if (parts.length !== 3) return false;
+        return `${parts[1]}-${parts[2]}` === todayStr;
+      })
+      .map(([userId]) => `<@${userId}>`);
+
+    if (birthdayUsers.length > 0 && channelId) {
+      const channel = c.channels.cache.get(channelId);
+      if (channel) {
+        channel.send(
+          `🎉 Happy Birthday ${birthdayUsers.join(
+            ", "
+          )}! Have a fantastic day! 🎂`
+        );
+      }
+    }
+  };
+
+  const now = new Date();
+  const next9am = new Date(now);
+  next9am.setHours(9, 0, 0, 0);
+  if (now > next9am) next9am.setDate(next9am.getDate() + 1);
+  const msUntil9am = next9am - now;
+
+  setTimeout(() => {
+    checkBirthdays();
+    setInterval(checkBirthdays, 24 * 60 * 60 * 1000);
+  }, msUntil9am);
 });
 
 client.on(Events.GuildMemberAdd, async (member) => {
