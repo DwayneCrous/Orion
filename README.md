@@ -69,27 +69,31 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 ### API & Utility Commands
 
 - `/bot-updates [update:<string>]`
-
   - Interactively compose and preview a bot update announcement. Edit the message before sending, then notify everyone online in the current channel with an embed and @here mention.
-
 - `/get-avatar user:<user>`
-
   - Get the avatar of any user.
-
 - `/create-poll question:<string> option1:<string> option2:<string> duration:<minutes>`
-
   - Create a poll with a custom question, two options, and a voting duration (in minutes). Users vote by reacting with 🟩 or 🟦. The bot announces the result when the poll ends.
-
 - `/todays-overview`
   - Get a daily overview with weather and top 3 news headlines for South Africa.
 - `/get-weather location:<string> units:<Celsius|Fahrenheit>`
   - Get current weather for a location.
 - `/currency-convert amount:<number> from_currency:<string> to_currency:<string>`
   - Convert currency amounts.
-- `/get-avatar user:<user>`
-  - Get the avatar of any user.
 - `/server-info`
-  - Get information about the server, including member count, creation date and server owner.
+  - Get information about the server, including member count, creation date, and server owner.
+- `/remind-me time:<string> message:<string>`
+  - Set a personal reminder. The bot will DM you at the specified time.
+- `/list-birthdays`
+  - List all registered user birthdays in the server.
+- `/set-birthday date:<YYYY-MM-DD>`
+  - Set or update your birthday for birthday announcements.
+- `/set-nickname user:<user> nickname:<string>`
+  - Change a user's nickname (requires permission).
+- `/set-role user:<user> role:<role>`
+  - Assign a role to a user (requires permission).
+- `/set-slowmode channel:<channel> duration:<seconds>`
+  - Set slowmode duration for a channel.
 
 ### Moderation
 
