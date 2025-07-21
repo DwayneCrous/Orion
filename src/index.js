@@ -184,9 +184,8 @@ client.on("messageCreate", async (message) => {
     return;
   }
   const presence = member.presence;
-  if (!presence) return;
-  const status = presence.status;
-  if (["offline", "idle", "dnd"].includes(status)) {
+  const status = presence?.status;
+  if (!presence || ["offline", "idle", "dnd"].includes(status)) {
     await message.reply(
       "https://cdn.discordapp.com/attachments/1269017675544268852/1396456663027941497/5ltbz8.png?ex=687e271d&is=687cd59d&hm=1fccf934b7ff80b5b9392191bdc659b286ae723b73158464109241a84f5ed613&"
     );
