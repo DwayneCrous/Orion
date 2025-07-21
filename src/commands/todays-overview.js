@@ -6,7 +6,7 @@ module.exports = {
     .setDescription("Get a summary of today's weather and news for a city."),
 
   async execute(interaction) {
-    await interaction.deferReply({});
+    await interaction.deferReply();
     function getGreeting() {
       const now = new Date();
       const hour = now.getHours();

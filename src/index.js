@@ -203,20 +203,34 @@ client.on(Events.InteractionCreate, async (interaction) => {
     return;
   }
 
+  // log the difference between interaction.createdAt and now
+  console.log(
+    "Interaction ping (ms):",
+    Date.now() - interaction.createdAt.getTime()
+  );
+
   try {
     await command.execute(interaction);
   } catch (error) {
+    console.log(
+      "Command execution time (ms):",
+      Date.now() - interaction.createdAt.getTime()
+    );
     console.error(error);
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({
-        content: "There was an error while executing this command!",
-        flags: MessageFlags.Ephemeral,
-      });
-    } else {
-      await interaction.reply({
-        content: "There was an error while executing this command!",
-        flags: MessageFlags.Ephemeral,
-      });
+    try {
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({
+          content: "There was an error while executing this command!",
+          flags: MessageFlags.Ephemeral,
+        });
+      } else {
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+    } catch (err) {
+      console.error("❌ Error sending interaction error:", err);
     }
   }
 });
