@@ -47,6 +47,8 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
    WEATHER_API_KEY=your_openweathermap_api_key
    NEWS_API_KEY=your_newsapi_key
    EXCHANGE_RATE_API_KEY=your_exchangerate_api_key
+   WELCOME_CHANNEL_ID=your_welcome_channel_id
+   BIRTHDAY_CHANNEL_ID=your_birthday_channel_id
    ```
 
 4. **Register commands**
