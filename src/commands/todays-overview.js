@@ -1,4 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+require("dotenv").config();
+const { GoogleGenAI } = require("@google/genai");
+
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -45,12 +49,28 @@ module.exports = {
       .setTitle(`${getGreeting()} ${user} 👋`);
     try {
       const weather = await getWeather("Port Elizabeth");
+      let geminiSummary = "";
+      try {
+        const geminiPrompt = `Given the following weather data for Port Elizabeth, South Africa, write a medium condensed paragraph describing the weather, what activities would be nice, whether to stay inside, etc.\nWeather data: ${JSON.stringify(
+          weather
+        )}`;
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: geminiPrompt,
+        });
+        geminiSummary = response.text || "";
+      } catch (err) {
+        console.error("❌ Gemini summary failed:", err);
+      }
       const news = await getNews().catch((err) => {
         console.error("❌ News fetch failed:", err);
         return [];
       });
       embed.setDescription(
         `Here's your daily overview for today:\n\n` +
+          (geminiSummary
+            ? `**🤖 Gemini's Weather Overview:**\n${geminiSummary}\n\n`
+            : "") +
           `**🌤 Weather Report**\n` +
           `📍 **Location:** ${weather.location}\n` +
           `🌡️ **Temperature:** ${weather.temp}°C\n` +
@@ -75,7 +95,7 @@ module.exports = {
         });
       }
       embed.setFooter({
-        text: "Powered by OpenWeather and NewsAPI",
+        text: "Powered by OpenWeather, NewsAPI & Gemini",
       });
     } catch (err) {
       console.error("❌ Overview error:", err);
