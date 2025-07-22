@@ -18,16 +18,37 @@ module.exports = {
       if (hour < 18) return "Good afternoon";
       return "Good evening";
     }
-    const getWeather = async (city) => {
+
+    const getTodaysForecast = async (city) => {
       const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${process.env.WEATHER_API_KEY}`
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${process.env.WEATHER_API_KEY}`
       );
       const data = await res.json();
-      if (data.cod !== 200) throw new Error("Failed to fetch weather");
+      if (data.cod !== "200") throw new Error("Failed to fetch forecast");
+      const today = new Date().toISOString().slice(0, 10);
+      const intervals = data.list.filter((item) =>
+        item.dt_txt.startsWith(today)
+      );
+      if (!intervals.length) throw new Error("No forecast data for today");
+
+      const temps = intervals.map((i) => i.main.temp);
+      const minTemp = Math.min(...temps);
+      const maxTemp = Math.max(...temps);
+
+      const descCounts = {};
+      intervals.forEach((i) => {
+        const desc = i.weather[0].description;
+        descCounts[desc] = (descCounts[desc] || 0) + 1;
+      });
+      const mostCommonDesc = Object.entries(descCounts).sort(
+        (a, b) => b[1] - a[1]
+      )[0][0];
       return {
-        temp: data.main.temp,
-        desc: data.weather[0].description,
-        location: data.name,
+        location: data.city.name,
+        minTemp,
+        maxTemp,
+        intervals,
+        desc: mostCommonDesc,
       };
     };
     const getNews = async () => {
@@ -48,12 +69,18 @@ module.exports = {
       .setTimestamp()
       .setTitle(`${getGreeting()} ${user} 👋`);
     try {
-      const weather = await getWeather("Port Elizabeth");
+      const forecast = await getTodaysForecast("Port Elizabeth");
       let geminiSummary = "";
       try {
-        const geminiPrompt = `Given the following weather data for Port Elizabeth, South Africa, write a medium condensed paragraph describing the weather, what activities would be nice, whether to stay inside, etc.\nWeather data: ${JSON.stringify(
-          weather
-        )}`;
+        const geminiPrompt = `Given the following weather forecast data for Port Elizabeth, 
+                              South Africa, write a short and sweet paragraph describing the 
+                              weather for the day, what activities would be nice, whether to 
+                              stay inside, sort of like jarvis does when tony stark wakes up 
+                              and jarvis gives him the overview. You don't have to address me
+                              as sir or ma'am, you can just go straight to the overview, also
+                              don't say good morning or good evening or afternoon.\nForecast data: ${JSON.stringify(
+                                forecast.intervals
+                              )}`;
         const response = await ai.models.generateContent({
           model: "gemini-2.5-flash",
           contents: geminiPrompt,
@@ -72,9 +99,11 @@ module.exports = {
             ? `**🤖 Gemini's Weather Overview:**\n${geminiSummary}\n\n`
             : "") +
           `**🌤 Weather Report**\n` +
-          `📍 **Location:** ${weather.location}\n` +
-          `🌡️ **Temperature:** ${weather.temp}°C\n` +
-          `☁️ **Condition:** ${weather.desc}\n\n`
+          `📍 **Location:** ${forecast.location}\n` +
+          `🌡️ **Min/Max Temperature:** ${forecast.minTemp.toFixed(
+            1
+          )}°C / ${forecast.maxTemp.toFixed(1)}°C\n` +
+          `☁️ **Condition:** ${forecast.desc}\n\n`
       );
       if (news.length > 0) {
         embed.addFields({
