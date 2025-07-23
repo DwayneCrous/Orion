@@ -84,6 +84,11 @@ module.exports = {
         const response = await ai.models.generateContent({
           model: "gemini-2.5-flash",
           contents: geminiPrompt,
+          generationConfig: {
+            temperature: 2,
+            topP: 1,
+            maxOutputTokens: 300,
+          },
         });
         geminiSummary = response.text || "";
       } catch (err) {
