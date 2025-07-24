@@ -30,8 +30,16 @@ module.exports = {
       return;
     }
 
-    // Format: <@userId>: YYYY-MM-DD
-    const lines = entries.map(([userId, date]) => `${userId}: ${date}`);
+    const lines = await Promise.all(
+      entries.map(async ([userId, date]) => {
+        try {
+          const member = await interaction.guild.members.fetch(userId);
+          return `${member.user.username}: ${date}`;
+        } catch {
+          return `Unknown User (${userId}): ${date}`;
+        }
+      })
+    );
     const message = `**Birthdays:**\n` + lines.join("\n");
     await interaction.reply(message);
   },
