@@ -12,6 +12,16 @@ module.exports = {
     ),
   async execute(interaction) {
     const date = interaction.options.getString("date");
+
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) {
+      await interaction.reply({
+        content: "Invalid date format. Please use YYYY-MM-DD.",
+        ephemeral: true,
+      });
+      return;
+    }
+
     const fs = require("fs");
     const path = require("path");
     const dataDir = path.join(__dirname, "../../data");
