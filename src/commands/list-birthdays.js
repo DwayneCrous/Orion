@@ -31,7 +31,7 @@ module.exports = {
     }
 
     // Format: <@userId>: YYYY-MM-DD
-    const lines = entries.map(([userId, date]) => `<@${userId}>: ${date}`);
+    const lines = entries.map(([userId, date]) => `${userId}: ${date}`);
     const message = `**Birthdays:**\n` + lines.join("\n");
     await interaction.reply(message);
   },

@@ -30,10 +30,15 @@ module.exports = {
     try {
       const client = interaction.client;
       const filter = client.badWordFilter || [];
+      const fs = require("fs");
+      const path = require("path");
+      const badWordsPath = path.join(__dirname, "../../data/bad-words.json");
+
       if (toggle) {
         if (!filter.includes(word)) {
           filter.push(word);
           client.badWordFilter = filter;
+          fs.writeFileSync(badWordsPath, JSON.stringify(filter, null, 2));
           await interaction.editReply(
             `✅ Bad word filter enabled. Filtering out: **${word}**`
           );
@@ -47,6 +52,7 @@ module.exports = {
         if (index > -1) {
           filter.splice(index, 1);
           client.badWordFilter = filter;
+          fs.writeFileSync(badWordsPath, JSON.stringify(filter, null, 2));
           await interaction.editReply(
             `✅ Bad word filter disabled for: **${word}**`
           );

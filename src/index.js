@@ -3,6 +3,20 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const remindersPath = path.join(__dirname, "../data/reminders.json");
+const badWordsPath = path.join(__dirname, "../data/bad-words.json");
+
+function loadBadWordsOnStartup(client) {
+  if (!fs.existsSync(badWordsPath)) {
+    client.badWordFilter = [];
+    return;
+  }
+  try {
+    const raw = fs.readFileSync(badWordsPath, "utf8");
+    client.badWordFilter = JSON.parse(raw);
+  } catch (err) {
+    client.badWordFilter = [];
+  }
+}
 function loadRemindersOnStartup(client) {
   if (!fs.existsSync(remindersPath)) return;
   let reminders = [];
@@ -83,6 +97,9 @@ for (const file of commandFiles) {
 client.on("ready", (c) => {
   console.log(`✅ ${c.user.tag} is online successfully!`);
   loadRemindersOnStartup(client);
+
+  // Load bad word filter from persistent storage
+  loadBadWordsOnStartup(client);
 
   const fs = require("fs");
   const path = require("path");
