@@ -27,7 +27,7 @@ module.exports = {
     const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=${units}&appid=${process.env.WEATHER_API_KEY}`;
     try {
       await interaction.deferReply();
-      // Fetch current weather
+
       const weatherResponse = await fetch(weatherUrl);
       if (!weatherResponse.ok) {
         await interaction.editReply(
@@ -37,7 +37,6 @@ module.exports = {
       }
       const weatherData = await weatherResponse.json();
 
-      // Fetch forecast data
       const forecastResponse = await fetch(forecastUrl);
       let forecastField = {
         name: "Forecast",
@@ -54,7 +53,6 @@ module.exports = {
           item.dt_txt.startsWith(todayDateStr)
         );
         if (todayForecast.length > 0) {
-          // Show up to 8 intervals (24 hours, 3-hour steps)
           const hourlyTemps = todayForecast.map((item) => {
             const hour = new Date(item.dt_txt)
               .getHours()
@@ -70,7 +68,6 @@ module.exports = {
         }
       }
 
-      // Dynamic emoji based on weather condition
       let weatherEmoji = "🌤️";
       if (
         weatherData.weather &&
