@@ -70,8 +70,45 @@ module.exports = {
         }
       }
 
+      // Dynamic emoji based on weather condition
+      let weatherEmoji = "🌤️";
+      if (
+        weatherData.weather &&
+        weatherData.weather[0] &&
+        weatherData.weather[0].main
+      ) {
+        const main = weatherData.weather[0].main.toLowerCase();
+        switch (main) {
+          case "clear":
+            weatherEmoji = "☀️";
+            break;
+          case "clouds":
+            weatherEmoji = "☁️";
+            break;
+          case "rain":
+            weatherEmoji = "🌧️";
+            break;
+          case "drizzle":
+            weatherEmoji = "🌦️";
+            break;
+          case "thunderstorm":
+            weatherEmoji = "⛈️";
+            break;
+          case "snow":
+            weatherEmoji = "❄️";
+            break;
+          case "mist":
+          case "fog":
+          case "haze":
+            weatherEmoji = "🌫️";
+            break;
+          default:
+            weatherEmoji = "🌤️";
+        }
+      }
+
       const embed = new EmbedBuilder()
-        .setTitle(`🌤️ Weather in ${weatherData.name}`)
+        .setTitle(`${weatherEmoji} Weather in ${weatherData.name}`)
         .setDescription(`**Current Temperature:** ${weatherData.main.temp}°`)
         .setColor("#ea76cb")
         .addFields(
