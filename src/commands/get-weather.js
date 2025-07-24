@@ -23,24 +23,69 @@ module.exports = {
   async execute(interaction) {
     const location = interaction.options.getString("location");
     const units = interaction.options.getString("units");
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=${units}&appid=${process.env.WEATHER_API_KEY}`;
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=${units}&appid=${process.env.WEATHER_API_KEY}`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=${units}&appid=${process.env.WEATHER_API_KEY}`;
     try {
       await interaction.deferReply();
-      const response = await fetch(url);
-      if (!response.ok) {
+      // Fetch current weather
+      const weatherResponse = await fetch(weatherUrl);
+      if (!weatherResponse.ok) {
         await interaction.editReply(
           "⚠️ Weather data not found for that location."
         );
         return;
       }
-      const data = await response.json();
+      const weatherData = await weatherResponse.json();
+
+      // Fetch forecast data
+      const forecastResponse = await fetch(forecastUrl);
+      let forecastField = {
+        name: "Forecast",
+        value: "No forecast data available.",
+        inline: false,
+      };
+      if (forecastResponse.ok) {
+        const forecastData = await forecastResponse.json();
+
+        const today = new Date();
+        const todayDateStr = today.toISOString().slice(0, 10);
+
+        const todayForecast = forecastData.list.filter((item) =>
+          item.dt_txt.startsWith(todayDateStr)
+        );
+        if (todayForecast.length > 0) {
+          // Show up to 8 intervals (24 hours, 3-hour steps)
+          const hourlyTemps = todayForecast.map((item) => {
+            const hour = new Date(item.dt_txt)
+              .getHours()
+              .toString()
+              .padStart(2, "0");
+            return `${hour}:00 - ${item.main.temp}°`;
+          });
+          forecastField = {
+            name: "Today's Hourly Forecast",
+            value: hourlyTemps.join(" | "),
+            inline: false,
+          };
+        }
+      }
+
       const embed = new EmbedBuilder()
-        .setTitle(`🌤️ Weather in ${data.name}`)
-        .setDescription(`**Current Temperature:** ${data.main.temp}°`)
+        .setTitle(`🌤️ Weather in ${weatherData.name}`)
+        .setDescription(`**Current Temperature:** ${weatherData.main.temp}°`)
         .setColor("#ea76cb")
         .addFields(
-          { name: "Humidity", value: `${data.main.humidity}%`, inline: true },
-          { name: "Wind Speed", value: `${data.wind.speed} m/s`, inline: true }
+          {
+            name: "Humidity",
+            value: `${weatherData.main.humidity}%`,
+            inline: true,
+          },
+          {
+            name: "Wind Speed",
+            value: `${weatherData.wind.speed} m/s`,
+            inline: true,
+          },
+          forecastField
         )
         .setFooter({
           text: "Powered by OpenWeather",
