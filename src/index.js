@@ -98,7 +98,6 @@ client.on("ready", (c) => {
   console.log(`✅ ${c.user.tag} is online successfully!`);
   loadRemindersOnStartup(client);
 
-  // Load bad word filter from persistent storage
   loadBadWordsOnStartup(client);
 
   const fs = require("fs");
@@ -194,6 +193,29 @@ client.on(Events.GuildMemberAdd, async (member) => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!message.guild) return;
+
+  const badWords = message.client.badWordFilter || [];
+  const contentLower = message.content.toLowerCase();
+  const foundBadWord = badWords.find((word) => {
+    const regex = new RegExp(
+      `\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+      "i"
+    );
+    return regex.test(contentLower);
+  });
+  if (foundBadWord) {
+    try {
+      await message.delete();
+      await message.channel.send({
+        content: `🚫 <@${message.author.id}> Your message contained a filtered word and was deleted.`,
+        allowedMentions: { users: [message.author.id] },
+      });
+    } catch (err) {
+      console.error("Failed to delete message with bad word:", err);
+    }
+    return;
+  }
+
   let member;
   try {
     member = await message.guild.members.fetch(message.author.id);
