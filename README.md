@@ -12,8 +12,9 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 - **Server Info**: Get information about the server, including member count and creation date.
 - **News Headlines**: Get the top 3 latest news headlines for South Africa in the daily overview.
 - **Currency Converter**: Convert amounts between currencies.
-- **Moderation Tools**: Kick, ban, mute users, bulk delete messages, and filter bad words (now with per-word toggling and detailed feedback).
-- **Bad Word Filter**: Enable or disable filtering of specific words, with instant moderation.
+- **Moderation Tools**: Kick, ban, mute users, bulk delete messages, and filter bad words (case-insensitive, per-word toggling, instant moderation, and listing).
+- **Bad Word Filter**: Enable or disable filtering of specific words (case-insensitive, always stored and checked in lowercase), with instant message deletion and user notification.
+- **List Bad Words**: View all currently filtered words in a stylish embed (color: `#1e66f5`).
 - **Polls**: Create quick polls with custom questions, two options, and a timed voting period.
 - **Mini-Games**: Flip a coin, roll a dice, play rock-paper-scissors—all with interactive embeds.
 - **User Utilities**: Get any user's avatar with a single command.
@@ -108,7 +109,9 @@ Orion is a multi-purpose Discord bot designed for moderation, utility, and fun. 
 - `/mute-user user:<user> duration:<seconds>`
   - Temporarily mute a user, with feedback.
 - `/bad-word-filter toggle:<Enable|Disable> word:<string>`
-  - Enable or disable filtering of specific words (per-word toggle, instant effect).
+  - Enable or disable filtering of specific words.
+- `/list-bad-words`
+  - List all words currently in the bad word filter.
 
 ### Mini-Games
 
