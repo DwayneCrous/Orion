@@ -16,7 +16,7 @@ module.exports = {
   async execute(interaction) {
     await interaction.deferReply({ flags: "Ephemeral" });
     const toggle = interaction.options.getBoolean("toggle");
-    const word = interaction.options.getString("word");
+    let word = interaction.options.getString("word");
     if (toggle === null) {
       await interaction.editReply(
         "⚠️ Please specify whether to enable or disable the filter."
@@ -27,9 +27,11 @@ module.exports = {
       await interaction.editReply("⚠️ Please provide a word to filter.");
       return;
     }
+    word = word.toLowerCase();
     try {
       const client = interaction.client;
-      const filter = client.badWordFilter || [];
+      let filter = client.badWordFilter || [];
+      filter = filter.map((w) => w.toLowerCase());
       const fs = require("fs");
       const path = require("path");
       const badWordsPath = path.join(__dirname, "../../data/bad-words.json");

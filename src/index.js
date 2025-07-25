@@ -194,9 +194,13 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!message.guild) return;
 
-  const badWords = message.client.badWordFilter || [];
+  // Ensure all bad words are checked in lowercase
+  const badWords = (message.client.badWordFilter || []).map((w) =>
+    w.toLowerCase()
+  );
   const contentLower = message.content.toLowerCase();
   const foundBadWord = badWords.find((word) => {
+    // Match whole word, case-insensitive
     const regex = new RegExp(
       `\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
       "i"
