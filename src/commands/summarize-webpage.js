@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
-const fetch = require("node-fetch");
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 // Use Gemini API for summarization
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
