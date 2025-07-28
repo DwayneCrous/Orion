@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
-const fetch = (...args) =>
-  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
+const puppeteer = require("puppeteer");
 
 // Use Gemini API for summarization
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
@@ -30,31 +30,20 @@ module.exports = {
       return;
     }
     try {
-      // Fetch webpage content
+      // Fetch webpage content using Puppeteer
       let html;
       try {
-        const res = await fetch(url, {
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-            Accept:
-              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
-            Referer: "https://www.google.com/",
-            Connection: "keep-alive",
-            "Upgrade-Insecure-Requests": "1",
-          },
-        });
-        if (!res.ok) {
-          await interaction.editReply(
-            `❌ Failed to fetch the webpage. HTTP status: ${res.status} ${res.statusText}. The site may block bots or require login.`
-          );
-          return;
-        }
-        html = await res.text();
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.setUserAgent(
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+        );
+        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+        html = await page.content();
+        await browser.close();
       } catch (err) {
         await interaction.editReply(
-          `❌ Network error while fetching the webpage: ${err.message}. The site may block bots, require login, or be temporarily unavailable.`
+          `❌ Puppeteer error while fetching the webpage: ${err.message}. The site may block bots, require login, or be temporarily unavailable.`
         );
         return;
       }
