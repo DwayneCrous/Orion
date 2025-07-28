@@ -24,7 +24,7 @@ module.exports = {
     // Basic URL validation
     if (!/^https?:\/\/.+/.test(url)) {
       await interaction.editReply(
-        "Please provide a valid URL starting with http or https."
+        "❌ Invalid URL. Please provide a valid URL starting with http or https."
       );
       return;
     }
@@ -38,13 +38,22 @@ module.exports = {
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
             Accept:
               "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            Referer: "https://www.google.com/",
+            Connection: "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
           },
         });
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        if (!res.ok) {
+          await interaction.editReply(
+            `❌ Failed to fetch the webpage. HTTP status: ${res.status} ${res.statusText}. The site may block bots or require login.`
+          );
+          return;
+        }
         html = await res.text();
       } catch (err) {
         await interaction.editReply(
-          "Failed to fetch the webpage. Please check the URL or try again later."
+          `❌ Network error while fetching the webpage: ${err.message}. The site may block bots, require login, or be temporarily unavailable.`
         );
         return;
       }
@@ -82,16 +91,23 @@ module.exports = {
             }),
           }
         );
+        if (!geminiRes.ok) {
+          await interaction.editReply(
+            `❌ Gemini API error: HTTP status ${geminiRes.status} ${geminiRes.statusText}. Check your API key and quota.`
+          );
+          return;
+        }
         geminiData = await geminiRes.json();
       } catch (err) {
         await interaction.editReply(
-          "Failed to contact Gemini API. Please try again later."
+          `❌ Network error while contacting Gemini API: ${err.message}. Please check your API key, quota, or try again later.`
         );
         return;
       }
 
       // Robust summary extraction
-      let summary = "Could not generate summary.";
+      let summary =
+        "❌ Could not generate summary. The webpage may be too complex, empty, or blocked.";
       if (geminiData?.candidates?.length) {
         const candidate = geminiData.candidates[0];
         if (candidate?.content?.parts?.length) {
@@ -103,7 +119,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
       await interaction.editReply(
-        "Failed to summarize the webpage. Please check the URL or try again later."
+        `❌ Unexpected error: ${error.message}. Please check the URL, your API key, or try again later.`
       );
     }
   },
