@@ -22,7 +22,7 @@ module.exports = {
   async execute(interaction) {
     const url = interaction.options.getString("url");
     await interaction.deferReply();
-    // Basic URL validation
+
     if (!/^https?:\/\/.+/.test(url)) {
       await interaction.editReply(
         "❌ Invalid URL. Please provide a valid URL starting with http or https."
@@ -48,7 +48,6 @@ module.exports = {
         return;
       }
 
-      // Extract main text (simple regex, for demo; use a library for production)
       const text = html
         .replace(/<script[\s\S]*?<\/script>/gi, "")
         .replace(/<style[\s\S]*?<\/style>/gi, "")
@@ -56,13 +55,11 @@ module.exports = {
         .replace(/\s+/g, " ")
         .trim();
 
-      // Prepare prompt for Gemini
       const prompt = `Summarize the following webpage content in one short, condensed paragraph:\n${text.slice(
         0,
         4000
       )}`;
 
-      // Call Gemini 2.5 Flash API
       let geminiData;
       try {
         const geminiRes = await fetch(
@@ -95,7 +92,6 @@ module.exports = {
         return;
       }
 
-      // Robust summary extraction
       let summary =
         "❌ Could not generate summary. The webpage may be too complex, empty, or blocked.";
       if (geminiData?.candidates?.length) {
