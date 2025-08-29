@@ -116,7 +116,9 @@ module.exports = {
           },
           {
             name: "Wind Speed",
-            value: `${weatherData.wind.speed} m/s`,
+            value: units === "imperial"
+              ? `${weatherData.wind.speed} mph`
+              : `${(weatherData.wind.speed * 3.6).toFixed(1)} km/h`,
             inline: true,
           },
           forecastField
