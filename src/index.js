@@ -63,6 +63,7 @@ const {
   IntentsBitField,
   Events,
   MessageFlags,
+  ActivityType,
 } = require("discord.js");
 
 const client = new Client({
