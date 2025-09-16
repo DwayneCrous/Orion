@@ -78,6 +78,24 @@ const client = new Client({
 
 client.commands = new Collection();
 
+// In-memory storage for GIF tracking (resets on bot restart)
+const gifTracker = new Map();
+
+// Helper functions for GIF tracking
+function hasReceivedGifToday(userId) {
+  const lastSent = gifTracker.get(userId);
+  if (!lastSent) return false;
+
+  const now = Date.now();
+  const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
+
+  return lastSent > twentyFourHoursAgo;
+}
+
+function markGifSentToday(userId) {
+  gifTracker.set(userId, Date.now());
+}
+
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
   .readdirSync(commandsPath)
@@ -232,9 +250,14 @@ client.on("messageCreate", async (message) => {
   const presence = member.presence;
   const status = presence?.status;
   if (!presence || ["offline", "idle", "dnd"].includes(status)) {
-    await message.reply(
-      "https://cdn.discordapp.com/attachments/1269017675544268852/1396456663027941497/5ltbz8.png?ex=687e271d&is=687cd59d&hm=1fccf934b7ff80b5b9392191bdc659b286ae723b73158464109241a84f5ed613&"
-    );
+    // Check if user already received GIF today
+    if (!hasReceivedGifToday(message.author.id)) {
+      await message.reply(
+        "https://cdn.discordapp.com/attachments/1269017675544268852/1396456663027941497/5ltbz8.png?ex=687e271d&is=687cd59d&hm=1fccf934b7ff80b5b9392191bdc659b286ae723b73158464109241a84f5ed613&"
+      );
+      // Mark that user received GIF today
+      markGifSentToday(message.author.id);
+    }
   }
 });
 
